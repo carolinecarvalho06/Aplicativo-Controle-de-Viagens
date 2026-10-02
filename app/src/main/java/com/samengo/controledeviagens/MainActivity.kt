@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 
 package com.samengo.controledeviagens
 
@@ -28,9 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samengo.controledeviagens.ui.theme.ControledeviagensTheme
 import java.util.Locale
+
 
 // Classe que representa uma viagem
 class Viagem(
@@ -42,25 +45,34 @@ class Viagem(
     val valorLitro: Double,
     val pedagio: Double
 ) {
+
+    // Calcula a distância percorrida
     fun calcularDistancia(): Double {
         return kmFinal - kmInicial
     }
 
+    // Calcula o custo total da viagem
     fun calcularCusto(): Double {
         return (litros * valorLitro) + pedagio
     }
 }
 
+
+// Tela principal
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
         setContent {
             ControledeviagensTheme {
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
+
                     ControleViagens(
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -70,6 +82,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+// Composable principal do aplicativo
 @Composable
 fun ControleViagens(modifier: Modifier = Modifier) {
 
@@ -83,57 +97,83 @@ fun ControleViagens(modifier: Modifier = Modifier) {
     var pedagio by remember { mutableStateOf("") }
     var mensagem by remember { mutableStateOf("") }
 
+
     // Lista de viagens cadastradas
     val viagens = remember {
         mutableStateListOf<Viagem>()
     }
 
-    // Totais calculados a partir da lista
+
+    // Total de quilômetros
     val totalKm = viagens.sumOf {
         it.calcularDistancia()
     }
 
+
+    // Total de litros
     val totalLitros = viagens.sumOf {
         it.litros
     }
 
+
+    // Total gasto
     val totalGasto = viagens.sumOf {
         it.calcularCusto()
     }
 
+
+    // Média de consumo
     val mediaKmLitro = if (totalLitros > 0) {
         totalKm / totalLitros
     } else {
         0.0
     }
 
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
+
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+
         Text(
             text = "Controle de Viagens",
             style = MaterialTheme.typography.headlineMedium
         )
 
+
         Text("Cadastre os dados da viagem")
 
+
+        // DATA
         OutlinedTextField(
             value = data,
-            onValueChange = { data = it },
-            label = { Text("Data da viagem") },
-            placeholder = { Text("DD/MM/AAAA") },
+            onValueChange = {
+                data = it
+            },
+            label = {
+                Text("Data da viagem")
+            },
+            placeholder = {
+                Text("DD/MM/AAAA")
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
+
+        // KM INICIAL
         OutlinedTextField(
             value = kmInicial,
-            onValueChange = { kmInicial = it },
-            label = { Text("Quilometragem inicial") },
+            onValueChange = {
+                kmInicial = it
+            },
+            label = {
+                Text("Quilometragem inicial")
+            },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
@@ -141,10 +181,16 @@ fun ControleViagens(modifier: Modifier = Modifier) {
             singleLine = true
         )
 
+
+        // KM FINAL
         OutlinedTextField(
             value = kmFinal,
-            onValueChange = { kmFinal = it },
-            label = { Text("Quilometragem final") },
+            onValueChange = {
+                kmFinal = it
+            },
+            label = {
+                Text("Quilometragem final")
+            },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
@@ -152,10 +198,16 @@ fun ControleViagens(modifier: Modifier = Modifier) {
             singleLine = true
         )
 
+
+        // LITROS
         OutlinedTextField(
             value = litros,
-            onValueChange = { litros = it },
-            label = { Text("Litros abastecidos/consumidos") },
+            onValueChange = {
+                litros = it
+            },
+            label = {
+                Text("Litros abastecidos/consumidos")
+            },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
@@ -163,19 +215,33 @@ fun ControleViagens(modifier: Modifier = Modifier) {
             singleLine = true
         )
 
+
+        // COMBUSTÍVEL
         OutlinedTextField(
             value = combustivel,
-            onValueChange = { combustivel = it },
-            label = { Text("Tipo de combustível") },
-            placeholder = { Text("Gasolina, etanol, diesel...") },
+            onValueChange = {
+                combustivel = it
+            },
+            label = {
+                Text("Tipo de combustível")
+            },
+            placeholder = {
+                Text("Gasolina, etanol, diesel...")
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
+
+        // VALOR DO LITRO
         OutlinedTextField(
             value = valorLitro,
-            onValueChange = { valorLitro = it },
-            label = { Text("Valor por litro (R$)") },
+            onValueChange = {
+                valorLitro = it
+            },
+            label = {
+                Text("Valor por litro (R$)")
+            },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
@@ -183,10 +249,16 @@ fun ControleViagens(modifier: Modifier = Modifier) {
             singleLine = true
         )
 
+
+        // PEDÁGIO
         OutlinedTextField(
             value = pedagio,
-            onValueChange = { pedagio = it },
-            label = { Text("Total de pedágios (R$)") },
+            onValueChange = {
+                pedagio = it
+            },
+            label = {
+                Text("Total de pedágios (R$)")
+            },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
@@ -194,14 +266,19 @@ fun ControleViagens(modifier: Modifier = Modifier) {
             singleLine = true
         )
 
+
+        // BOTÃO CADASTRAR
         Button(
             onClick = {
+
                 val inicial = kmInicial.toDoubleOrNullBR()
                 val final = kmFinal.toDoubleOrNullBR()
                 val qtdLitros = litros.toDoubleOrNullBR()
                 val precoLitro = valorLitro.toDoubleOrNullBR()
                 val valorPedagio = pedagio.toDoubleOrNullBR()
 
+
+                // Verifica se os campos foram preenchidos
                 if (
                     data.isBlank() ||
                     combustivel.isBlank() ||
@@ -211,16 +288,25 @@ fun ControleViagens(modifier: Modifier = Modifier) {
                     precoLitro == null ||
                     valorPedagio == null
                 ) {
+
                     mensagem = "Preencha todos os campos corretamente."
+
                 } else if (
+
+                // Verifica se os valores são válidos
                     inicial < 0 ||
                     final < inicial ||
                     qtdLitros <= 0 ||
                     precoLitro < 0 ||
                     valorPedagio < 0
+
                 ) {
+
                     mensagem = "Confira os valores informados."
+
                 } else {
+
+                    // Cria uma nova viagem
                     val viagem = Viagem(
                         data = data,
                         kmInicial = inicial,
@@ -231,9 +317,12 @@ fun ControleViagens(modifier: Modifier = Modifier) {
                         pedagio = valorPedagio
                     )
 
+
+                    // Adiciona a viagem na lista
                     viagens.add(viagem)
 
-                    // Limpa os campos após o cadastro
+
+                    // Limpa os campos
                     data = ""
                     kmInicial = ""
                     kmFinal = ""
@@ -242,83 +331,131 @@ fun ControleViagens(modifier: Modifier = Modifier) {
                     valorLitro = ""
                     pedagio = ""
 
+
                     mensagem = "Viagem cadastrada com sucesso!"
                 }
             },
+
             modifier = Modifier.fillMaxWidth()
+
         ) {
+
             Text("Cadastrar viagem")
         }
 
+
+        // Mensagem
         if (mensagem.isNotBlank()) {
-            Text(text = mensagem)
+
+            Text(
+                text = mensagem
+            )
         }
 
+
+        // RESUMO
         Text(
             text = "Resumo das viagens",
             style = MaterialTheme.typography.titleLarge
         )
 
+
         Card(
             modifier = Modifier.fillMaxWidth(),
+
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         ) {
+
             Column(
                 modifier = Modifier.padding(16.dp),
+
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Viagens cadastradas: ${viagens.size}")
-                Text("Total de quilômetros: ${totalKm.formatarBR()} km")
-                Text("Total de litros: ${totalLitros.formatarBR()} L")
-                Text("Total gasto: ${totalGasto.formatarMoeda()}")
-                Text("Média de consumo: ${mediaKmLitro.formatarBR()} km/l")
+
+                Text(
+                    "Viagens cadastradas: ${viagens.size}"
+                )
+
+                Text(
+                    "Total de quilômetros: ${totalKm.formatarBR()} km"
+                )
+
+                Text(
+                    "Total de litros: ${totalLitros.formatarBR()} L"
+                )
+
+                Text(
+                    "Total gasto: ${totalGasto.formatarMoeda()}"
+                )
+
+                Text(
+                    "Média de consumo: ${mediaKmLitro.formatarBR()} km/l"
+                )
             }
         }
 
+
+        // LISTA DE VIAGENS
         Text(
             text = "Viagens realizadas",
             style = MaterialTheme.typography.titleLarge
         )
 
+
+        // Caso não exista nenhuma viagem
         if (viagens.isEmpty()) {
-            Text("Nenhuma viagem cadastrada.")
+
+            Text(
+                "Nenhuma viagem cadastrada."
+            )
         }
 
-        // Percorre a lista e mostra cada viagem
+
+        // Percorre todas as viagens
         for (viagem in viagens) {
+
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
+
                 Column(
                     modifier = Modifier.padding(12.dp),
+
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
+
                     Text(
                         text = "Viagem de ${viagem.data}",
                         style = MaterialTheme.typography.titleMedium
                     )
 
+
                     Text(
                         "Combustível: ${viagem.combustivel}"
                     )
+
 
                     Text(
                         "KM inicial: ${viagem.kmInicial.formatarBR()}"
                     )
 
+
                     Text(
                         "KM final: ${viagem.kmFinal.formatarBR()}"
                     )
+
 
                     Text(
                         "Distância: ${viagem.calcularDistancia().formatarBR()} km"
                     )
 
+
                     Text(
                         "Litros: ${viagem.litros.formatarBR()} L"
                     )
+
 
                     Text(
                         "Custo do combustível: ${
@@ -326,12 +463,16 @@ fun ControleViagens(modifier: Modifier = Modifier) {
                         }"
                     )
 
+
                     Text(
                         "Pedágios: ${viagem.pedagio.formatarMoeda()}"
                     )
 
+
                     Text(
-                        "Custo total: ${viagem.calcularCusto().formatarMoeda()}"
+                        "Custo total: ${
+                            viagem.calcularCusto().formatarMoeda()
+                        }"
                     )
                 }
             }
@@ -339,18 +480,42 @@ fun ControleViagens(modifier: Modifier = Modifier) {
     }
 }
 
-// Aceita números digitados com vírgula ou ponto
+
+// Aceita números com vírgula ou ponto
 fun String.toDoubleOrNullBR(): Double? {
-    return this.trim()
+
+    return this
+        .trim()
         .replace(",", ".")
         .toDoubleOrNull()
 }
 
+
 // Formata números no padrão brasileiro
 fun Double.formatarBR(): String {
-    return String.format(Locale("pt", "BR"), "%.2f", this)
+
+    return String.format(
+        Locale("pt", "BR"),
+        "%.2f",
+        this
+    )
 }
 
+
+// Formata valores em reais
 fun Double.formatarMoeda(): String {
+
     return "R$ ${this.formatarBR()}"
+}
+
+
+// PREVIEW
+@Preview(showBackground = true)
+@Composable
+fun PreviewControleViagens() {
+
+    ControledeviagensTheme {
+
+        ControleViagens()
+    }
 }
