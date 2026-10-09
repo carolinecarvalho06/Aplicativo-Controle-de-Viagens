@@ -2,6 +2,7 @@
 
 package com.samengo.controledeviagens
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,21 +24,34 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.samengo.controledeviagens.ui.theme.ControledeviagensTheme
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.util.Locale
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "preferencias")
+val NOME_MOTORISTA = stringPreferencesKey("nome_motorista")
 
 class Viagem(
     val data: String,
@@ -96,6 +110,70 @@ fun ControleViagensApp() {
 }
 
 // -------------------------------------------------------------
+// COMPONENTE: MEU PERFIL (PREFERENCES DATASTORE)
+// -------------------------------------------------------------
+@Composable
+fun MeuPerfil(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var nome by remember { mutableStateOf("") }
+
+    val nomeFlow = remember(context) {
+        context.dataStore.data.map { preferences ->
+            preferences[NOME_MOTORISTA] ?: ""
+        }
+    }
+
+    val nomeSalvo by nomeFlow.collectAsState(initial = "")
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "Perfil do Motorista",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            OutlinedTextField(
+                value = nome,
+                onValueChange = { nome = it },
+                label = { Text("Nome do motorista") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        context.dataStore.edit { preferences ->
+                            preferences[NOME_MOTORISTA] = nome
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Salvar Motorista")
+            }
+
+            Text(
+                text = if (nomeSalvo.isNotBlank()) "Motorista salvo: $nomeSalvo" else "Nenhum motorista salvo ainda",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+    }
+}
+
+// -------------------------------------------------------------
 // TELA 1: LISTAGEM E RESUMO
 // -------------------------------------------------------------
 @Composable
@@ -119,6 +197,8 @@ fun TelaListaViagens(
             text = "Controle de Viagens",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        MeuPerfil()
 
         Button(
             onClick = { navController.navigate("cadastro") },
