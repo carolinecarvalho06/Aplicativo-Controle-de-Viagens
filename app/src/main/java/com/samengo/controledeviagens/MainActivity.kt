@@ -26,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,35 +52,27 @@ import java.util.Locale
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "preferencias")
 val NOME_MOTORISTA = stringPreferencesKey("nome_motorista")
 
-class Viagem(
-    val data: String,
-    val kmInicial: Double,
-    val kmFinal: Double,
-    val litros: Double,
-    val combustivel: String,
-    val valorLitro: Double,
-    val pedagio: Double
-) {
-    fun calcularDistancia(): Double = kmFinal - kmInicial
-    fun calcularCusto(): Double = (litros * valorLitro) + pedagio
-}
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val repository = ViagemRepository(applicationContext)
         setContent {
             ControledeviagensTheme {
-                ControleViagensApp()
+                ControleViagensApp(repository)
             }
         }
     }
 }
 
 @Composable
-fun ControleViagensApp() {
+fun ControleViagensApp(repository: ViagemRepository) {
     val navController = rememberNavController()
-    val viagens = remember { mutableStateListOf<Viagem>() }
+    var viagens by remember { mutableStateOf(repository.listar()) }
+
+    fun atualizarViagens() {
+        viagens = repository.listar()
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         NavHost(
@@ -99,7 +90,8 @@ fun ControleViagensApp() {
             composable("cadastro") {
                 TelaCadastroViagem(
                     onAdicionarViagem = { viagem ->
-                        viagens.add(viagem)
+                        repository.inserir(viagem)
+                        atualizarViagens()
                         navController.navigateUp()
                     },
                     navController = navController
@@ -433,7 +425,8 @@ fun Double.formatarMoeda(): String {
 @Preview(showBackground = true)
 @Composable
 fun PreviewControleViagens() {
+    val context = LocalContext.current
     ControledeviagensTheme {
-        ControleViagensApp()
+        ControleViagensApp(ViagemRepository(context))
     }
 }

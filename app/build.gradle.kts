@@ -54,6 +54,9 @@ dependencies {
     // Dependência de navegação adicionada:
     implementation("androidx.navigation:navigation-compose:2.8.0")
 
+    // Dependência de DataStore:
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
